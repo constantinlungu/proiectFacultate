@@ -37,7 +37,7 @@ void logarePassword(char username[50], int index)
 
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-	cout << "\n\t\t\t\t\t\t       BLACK JACK \n\n\n";
+	cout << "\n\t\t\t\t\t\t       BLACK JACK (Logare) \n\n\n";
 
 	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
 
@@ -97,7 +97,7 @@ void logareUsername()
 
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-	cout << "\n\t\t\t\t\t\t       BLACK JACK \n\n\n";
+	cout << "\n\t\t\t\t\t\t       BLACK JACK (Logare) \n\n\n";
 
 	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
 		
@@ -141,8 +141,189 @@ void logareUsername()
 	}
 }
 
-void inregistrare()
+void inregistrareMoney(char username[50], char password[50])
 {
+	system("cls");
+
+	long long int money;
+
+	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+	cout << "\n\t\t\t\t\t\t       BLACK JACK (Inregistrare) \n\n\n";
+
+	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+	cout << "Username: " << username << "\n";
+
+	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+	cout << "Password : ";
+	for (int i = 0; i < strlen(password); i++)
+		cout << "*";
+	cout << "\n";
+
+	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+	cout << "Suma cu care doriti sa va inregistrati: ";
+
+	cin >> money;
+
+	if (money == 0)
+		goBack = 1;
+	else
+	{
+		if (money < 0)
+		{
+			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+			cout << "Suma inregistrata trebuie sa fie mai mare decat 0! \n";
+
+			system("pause");
+
+			inregistrareMoney(username,password);
+		}
+		else
+		{
+
+			ofstream writeUsername("username.txt", ios::app);
+			ofstream writePass("password.txt", ios::app);
+			ofstream writeMoney("money.txt", ios::app);
+
+			writeUsername << username << "\n";
+			writePass << password << "\n";
+			writeMoney << money << "\n";
+
+			writeUsername.close();
+			writePass.close();
+			writeMoney.close();
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << "\n\t\t\t\t\t      V-ati inregistrat cu succes ! \n";
+
+		}
+
+
+	}
+}
+
+void inregistrarePassword(char username[50])
+{
+	system("cls");
+
+	char password[50];
+
+	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+	cout << "\n\t\t\t\t\t\t       BLACK JACK (Inregistrare) \n\n\n";
+
+	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+	cout << "Username: " << username << "\n";
+	
+	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+	cout << "Password (minim 3 caractere): ";
+
+	cin.get();
+	cin.get(password, 50);
+
+	if (strcmp(password, "0") == 0)
+		goBack = 1;
+	else
+		if (strlen(password) < 3)
+		{
+			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+			cout << "Parola trebuie sa contina minim 3 caractere !\n\n";
+
+			system("pause");
+			inregistrarePassword(username);
+		}
+		else
+			inregistrareMoney(username, password);
+}
+
+void inregistrareUsername()
+{
+	system("cls");
+
+	char username[50], password[50];
+	int ok = 1;
+
+	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+	cout << "\n\t\t\t\t\t\t       BLACK JACK (Inregistrare) \n\n\n";
+
+	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+	cout << "Username (minim 3 caractere): ";
+	cin.get();
+	cin.get(username, 50);
+
+	if (strcmp(username, "0") == 0)
+		goBack = 1;
+	else
+	{
+		ifstream readUsername("username.txt");
+		char currentName[50];
+
+		if (!isalpha(username[0]) && strcmp(username, "0") != 0)
+		{
+			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+			cout << "Username-ul trebuie sa inceapa cu o litera !\n";
+			ok = 0;
+		}
+
+		if (strlen(username) < 3 && strcmp(username, "0") != 0)
+		{
+			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+			cout << "Username-ul trebuie sa contina minim 3 caractere !\n";
+			ok = 0;
+		}
+
+		if (strchr(username, ' ') != NULL)
+		{
+			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+			cout << "Username-ul nu trebuie sa contina spatii !\n";
+			ok = 0;
+		}
+
+		while (!readUsername.eof())
+		{
+			readUsername >> currentName;
+			if (_stricmp(username, currentName) == 0)
+			{
+				ok = 0;
+
+				SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+				cout << "Acest username este deja inregistrat ! \n";
+
+				break;
+			}
+		}
+
+		readUsername.close();
+
+		if (!ok)
+		{
+			cout << "\n";
+			system("pause");
+			inregistrareUsername();
+		}
+		else
+			inregistrarePassword(username);
+	}
+
 
 }
 
@@ -159,7 +340,7 @@ void menu()
 		cout << "1. Logare \n";
 		cout << "2. Inregistrare \n";
 		cout << "3. Iesire \n\n";
-		cout << "Tastati 1 pentru a va loga sau 2 pentru a va inregistra: ";
+		cout << "Alegeti una din optiunile de mai sus: ";
 
 		cin >> option;
 	} while (strcmp(option, "1") != 0 && strcmp(option, "2") != 0 && strcmp(option, "3") != 0);
@@ -169,7 +350,7 @@ void menu()
 
 	else
 		if (strcmp(option, "2") == 0)
-			inregistrare();
+			inregistrareUsername();
 		else
 			exit(0);
 
