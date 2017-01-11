@@ -1,6 +1,5 @@
 ﻿  main.cpp
-c:\users\cocol\documents\visual studio 2015\projects\blackjack project\blackjack project\main.cpp(163): warning C4018: '<': signed/unsigned mismatch
-c:\users\cocol\documents\visual studio 2015\projects\blackjack project\blackjack project\main.cpp(254): warning C4101: 'password': unreferenced local variable
-c:\users\cocol\documents\visual studio 2015\projects\blackjack project\blackjack project\main.cpp(405): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\cocol\documents\visual studio 2015\projects\blackjack project\blackjack project\main.cpp(462): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\cocol\documents\visual studio 2015\projects\blackjack project\blackjack project\main.cpp(654): warning C4018: '<=': signed/unsigned mismatch
   Blackjack project.vcxproj -> C:\Users\cocol\Documents\Visual Studio 2015\Projects\Blackjack project\Debug\Blackjack project.exe
   Blackjack project.vcxproj -> C:\Users\cocol\Documents\Visual Studio 2015\Projects\Blackjack project\Debug\Blackjack project.pdb (Full PDB)

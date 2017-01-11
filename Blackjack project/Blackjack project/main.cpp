@@ -7,6 +7,10 @@
 #include <conio.h>
 
 #define NUMBER_OF_CARDS 52
+#define title "\n\t\t\t\t\t\t       BLACK JACK \n\n\n"
+#define login "\n\t\t\t\t\t\t       BLACK JACK (Log in) \n\n\n"
+#define signup "\n\t\t\t\t\t\t       BLACK JACK (Sign up) \n\n\n"
+#define options "\n\t\t\t\t\t\t       BLACK JACK (Options) \n\n\n"
 
 using namespace std;
 
@@ -18,26 +22,29 @@ struct deck
 
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-int goBack;
+int goBack, index;
+char password[50], username[50];
+long long int playerMoney;
 
-void gameMenu(char username[50], long long int playerMoney)
-{
-	cout << username << " has " << playerMoney<<"$";
-}
+bool isOk = false;
 
-void logarePassword(char username[50], int index)
+void loginPassword()
 {
+	if (!isOk)
+	{
+		isOk = true;
+		getchar();
+	}
 	system("cls");
 
 	ifstream pass("password.txt");
 	ifstream money("money.txt");
 
-	char password[50], currentPassword[50];
-	long long int playerMoney;
+	char currentPassword[50];
 
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-	cout << "\n\t\t\t\t\t\t       BLACK JACK (Logare) \n\n\n";
+	cout << login;
 
 	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
 
@@ -48,8 +55,8 @@ void logarePassword(char username[50], int index)
 	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
 	cout << "Password: ";
 	
-	cin.get();
-	cin.get(password, 50);
+	//cin.get();
+	cin.getline(password, 50);
 
 	//cout << password;
 
@@ -70,7 +77,11 @@ void logarePassword(char username[50], int index)
 			pass.close();
 			money.close();
 
-			gameMenu(username, playerMoney);
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << "\n\t\t\t\t\t      V-ati logat cu succes ! \n";
+
+			getchar();
 		}
 		else
 		{
@@ -80,24 +91,25 @@ void logarePassword(char username[50], int index)
 
 			system("pause");
 
-			logarePassword(username, index);
+			loginPassword();
 		}
 	}
 
 }
 
-void logareUsername()
+void loginUsername()
 {
 	system("cls");
 
 	ifstream name("username.txt");
 
-	char username[50], currentName[50];
-	int ok = 0, index = 0;
+	char currentName[50];
+	int ok = 0;
+	index = 0;
 
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-	cout << "\n\t\t\t\t\t\t       BLACK JACK (Logare) \n\n\n";
+	cout << login;
 
 	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
 		
@@ -105,6 +117,8 @@ void logareUsername()
 
 	cout << "Username: ";
 	cin >> username;
+
+	isOk = false;
 
 	if (strcmp(username, "0") == 0)
 		goBack = 1;
@@ -126,7 +140,7 @@ void logareUsername()
 		{
 			name.close();
 			strcpy_s(username, currentName);
-			logarePassword(username, index);
+			loginPassword();
 		}
 
 		else
@@ -136,20 +150,18 @@ void logareUsername()
 
 			system("pause");
 
-			logareUsername();
+			loginUsername();
 		}
 	}
 }
 
-void inregistrareMoney(char username[50], char password[50])
+void signupMoney()
 {
 	system("cls");
 
-	long long int money;
-
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-	cout << "\n\t\t\t\t\t\t       BLACK JACK (Inregistrare) \n\n\n";
+	cout << signup;
 
 	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
 
@@ -160,7 +172,7 @@ void inregistrareMoney(char username[50], char password[50])
 	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
 
 	cout << "Password : ";
-	for (int i = 0; i < strlen(password); i++)
+	for (unsigned i = 0; i < strlen(password); i++)
 		cout << "*";
 	cout << "\n";
 
@@ -168,13 +180,13 @@ void inregistrareMoney(char username[50], char password[50])
 
 	cout << "Suma cu care doriti sa va inregistrati: ";
 
-	cin >> money;
+	cin >> playerMoney;
 
-	if (money == 0)
+	if (playerMoney == 0)
 		goBack = 1;
 	else
 	{
-		if (money < 0)
+		if (playerMoney < 0)
 		{
 			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
 
@@ -182,7 +194,7 @@ void inregistrareMoney(char username[50], char password[50])
 
 			system("pause");
 
-			inregistrareMoney(username,password);
+			signupMoney();
 		}
 		else
 		{
@@ -193,7 +205,7 @@ void inregistrareMoney(char username[50], char password[50])
 
 			writeUsername << username << "\n";
 			writePass << password << "\n";
-			writeMoney << money << "\n";
+			writeMoney << playerMoney << "\n";
 
 			writeUsername.close();
 			writePass.close();
@@ -203,21 +215,41 @@ void inregistrareMoney(char username[50], char password[50])
 
 			cout << "\n\t\t\t\t\t      V-ati inregistrat cu succes ! \n";
 
+			getchar();
+			getchar();
+
 		}
 
 
 	}
 }
 
-void inregistrarePassword(char username[50])
+int verifyPassword(char password[50])
+{
+	int ok = 1;
+
+	if (strlen(password) < 3 && strcmp(password, "0") != 0)
+	{
+		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+		cout << "Parola trebuie sa contina minim 3 caractere !\n\n";
+
+		ok = 0;
+	}
+
+	if (ok)
+		return 1;
+	
+	return 0;
+}
+
+void signupPassword()
 {
 	system("cls");
 
-	char password[50];
-
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-	cout << "\n\t\t\t\t\t\t       BLACK JACK (Inregistrare) \n\n\n";
+	cout << signup;
 
 	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
 
@@ -228,100 +260,112 @@ void inregistrarePassword(char username[50])
 	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
 	cout << "Password (minim 3 caractere): ";
 
-	cin.get();
-	cin.get(password, 50);
+	cin.getline(password, 50);
 
 	if (strcmp(password, "0") == 0)
 		goBack = 1;
 	else
-		if (strlen(password) < 3)
+		if (!verifyPassword(password))
 		{
-			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
-
-			cout << "Parola trebuie sa contina minim 3 caractere !\n\n";
-
+			cout << "\n";
 			system("pause");
-			inregistrarePassword(username);
+			signupPassword();
 		}
 		else
-			inregistrareMoney(username, password);
+			signupMoney();
 }
 
-void inregistrareUsername()
+int verifyUsername(char username[50])
+{
+	ifstream readUsername("username.txt");
+	char currentName[50];
+	int ok = 1;
+
+	cout << "\n";
+
+	if (!isalpha(username[0]) && strcmp(username, "0") != 0)
+	{
+		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+		cout << "Username-ul trebuie sa inceapa cu o litera !\n";
+		ok = 0;
+	}
+
+	if (strlen(username) < 3 && strcmp(username, "0") != 0)
+	{
+		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+		cout << "Username-ul trebuie sa contina minim 3 caractere !\n";
+		ok = 0;
+	}
+
+	if (strchr(username, ' ') != NULL)
+	{
+		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+		cout << "Username-ul nu trebuie sa contina spatii !\n";
+		ok = 0;
+	}
+
+	while (!readUsername.eof())
+	{
+		readUsername >> currentName;
+		if (_stricmp(username, currentName) == 0 && strcmp(currentName, "") != 0)
+		{
+			ok = 0;
+
+			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+			cout << "Acest username este deja inregistrat ! \n";
+
+			break;
+		}
+	}
+
+	readUsername.close();
+
+	if (ok)
+		return 1;
+
+	return 0;
+}
+
+void signupUsername()
 {
 	system("cls");
 
-	char username[50], password[50];
-	int ok = 1;
-
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-	cout << "\n\t\t\t\t\t\t       BLACK JACK (Inregistrare) \n\n\n";
+	cout << signup;
 
 	cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
 
 	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
 
 	cout << "Username (minim 3 caractere): ";
-	cin.get();
-	cin.get(username, 50);
+
+	if (!isOk)
+	{
+		getchar();
+		isOk = true;
+	}
+	
+	cin.getline(username, 50);
+	
 
 	if (strcmp(username, "0") == 0)
 		goBack = 1;
 	else
 	{
-		ifstream readUsername("username.txt");
-		char currentName[50];
 
-		if (!isalpha(username[0]) && strcmp(username, "0") != 0)
-		{
-			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
-
-			cout << "Username-ul trebuie sa inceapa cu o litera !\n";
-			ok = 0;
-		}
-
-		if (strlen(username) < 3 && strcmp(username, "0") != 0)
-		{
-			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
-
-			cout << "Username-ul trebuie sa contina minim 3 caractere !\n";
-			ok = 0;
-		}
-
-		if (strchr(username, ' ') != NULL)
-		{
-			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
-
-			cout << "Username-ul nu trebuie sa contina spatii !\n";
-			ok = 0;
-		}
-
-		while (!readUsername.eof())
-		{
-			readUsername >> currentName;
-			if (_stricmp(username, currentName) == 0)
-			{
-				ok = 0;
-
-				SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
-
-				cout << "Acest username este deja inregistrat ! \n";
-
-				break;
-			}
-		}
-
-		readUsername.close();
-
-		if (!ok)
+		if (!verifyUsername(username))
 		{
 			cout << "\n";
 			system("pause");
-			inregistrareUsername();
+			signupUsername();
 		}
 		else
-			inregistrarePassword(username);
+			signupPassword();
 	}
 
 
@@ -336,21 +380,24 @@ void menu()
 		system("cls");
 		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
-		cout << "\n\t\t\t\t\t\t       BLACK JACK \n\n\n";
-		cout << "1. Logare \n";
-		cout << "2. Inregistrare \n";
-		cout << "3. Iesire \n\n";
-		cout << "Alegeti una din optiunile de mai sus: ";
+		cout << title;
+		cout << "1. Log in \n";
+		cout << "2. Sign up \n";
+		cout << "3. Exit \n\n";
+		cout << "Choose an option: ";
 
 		cin >> option;
 	} while (strcmp(option, "1") != 0 && strcmp(option, "2") != 0 && strcmp(option, "3") != 0);
 
 	if (strcmp(option, "1") == 0)
-		logareUsername();
+		loginUsername();
 
 	else
 		if (strcmp(option, "2") == 0)
-			inregistrareUsername();
+		{
+			isOk = false;
+			signupUsername();
+		}
 		else
 			exit(0);
 
@@ -430,18 +477,323 @@ void shuffleCards(deck cards[NUMBER_OF_CARDS])
 	}*/
 }
 
+void option1()
+{
+	char newUsername[50];
+	bool ok;
+
+	if (!isOk)
+	{
+		isOk = true;
+		getchar();
+	}
+
+	do {
+
+		ok = true;
+		system("cls");
+
+		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+		cout << options;
+
+		cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+		SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+		cout << "New username: ";
+
+		cin.getline(newUsername, 50);
+
+		if (!verifyUsername(newUsername))
+		{
+			ok = false;
+			cout << "\n";
+			system("pause");
+		}
+
+	} while (!ok && strcmp(newUsername, "0") != 0);
+
+	if (strcmp(newUsername, "0") != 0)
+	{
+		char currentPassword[50];
+
+		do
+		{
+			cout << "\n";
+
+			system("cls");
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << options;
+
+			cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+			SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+			cout << "New username: " << newUsername << "\n";
+
+			SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+			cout << "Password: ";
+
+			cin.getline(currentPassword, 50);
+
+			if (strcmp(currentPassword, "0") != 0)
+			{
+				if (strcmp(password, currentPassword) != 0)
+				{
+					SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+					cout << "\nParola incorecta ! \n\n";
+					system("pause");
+				}
+			}
+		} while (strcmp(password, currentPassword) != 0 && strcmp(currentPassword, "0") != 0);
+
+		if (strcmp(currentPassword, "0") != 0)
+		{
+			ifstream readUsername("username.txt");
+			ofstream writeTemp("temp.txt");
+
+			char strTemp[50];
+
+			while (readUsername >> strTemp)
+			{
+
+				if (strcmp(strTemp, username) == 0)
+					strcpy_s(strTemp, newUsername);
+
+				writeTemp << strTemp << "\n";
+			}
+
+			strcpy_s(username, newUsername);
+
+			readUsername.close();
+			writeTemp.close();
+
+			remove("username.txt");
+			rename("temp.txt", "username.txt");
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << "\n\t\t\t\t\t   Username-ul a fost schimbat cu succes ! \n";
+
+			getchar();
+		}
+	}
+}
+
+void option2()
+{
+	char newPassword[50];
+	bool ok;
+
+	if (!isOk)
+	{
+		isOk = true;
+		getchar();
+	}
+
+	do {
+
+			ok = true;
+			system("cls");
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << options;
+
+			cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+			SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+			cout << "New password: ";
+
+			cin.getline(newPassword, 50);
+
+			if (!verifyPassword(newPassword))
+			{
+				ok = false;
+				cout << "\n";
+				system("pause");
+			}
+
+		} while (!ok && strcmp(newPassword, "0") != 0);
+
+	if (strcmp(newPassword, "0") != 0)
+	{
+		char currentPassword[50];
+
+		do
+		{
+			cout << "\n";
+
+			system("cls");
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << options;
+
+			cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+			SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+			cout << "New password: ";
+
+			for (int i = 1; i <= strlen(newPassword); i++)
+				cout << "*";
+
+			SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+			cout << "\nOld password: ";
+
+			cin.getline(currentPassword, 50);
+
+			if (strcmp(currentPassword, "0") != 0)
+			{
+				if (strcmp(password, currentPassword) != 0)
+				{
+					SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+					cout << "\nParola incorecta ! \n\n";
+					system("pause");
+				}
+			}
+
+		} while (strcmp(password, currentPassword) != 0 && strcmp(currentPassword, "0") != 0);
+
+		if (strcmp(currentPassword, "0") != 0)
+		{
+			ifstream readPassword("password.txt");
+			ofstream writeTemp("temp.txt");
+
+			char strTemp[50];
+
+			int i = 0;
+
+			while (readPassword.getline(strTemp,50))
+			{
+				i++;
+
+				if (strcmp(strTemp, password) == 0 && i==index)
+					strcpy_s(strTemp, newPassword);
+
+				writeTemp << strTemp << "\n";
+			}
+
+			strcpy_s(password, newPassword);
+
+			readPassword.close();
+			writeTemp.close();
+
+			remove("password.txt");
+			rename("temp.txt", "password.txt");
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << "\n\t\t\t\t\t   Parola a fost schimbata cu succes ! \n";
+
+			getchar();
+		}
+	}
+}
+
+void optionMenu()
+{
+	char option[20];
+
+	do {
+		system("cls");
+
+		SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+		cout << "Player: " << username << "\n";
+		cout << "Money: " << playerMoney << "$";
+
+		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+		cout << options;
+		cout << "1. Change username \n";
+		cout << "2. Change password \n";
+		cout << "3. Add money \n";
+		cout << "4. Log in to another account \n";
+		cout << "5. Back \n\n";
+		cout << "Choose an option: ";
+
+		cin >> option;
+
+		isOk = false;
+
+	} while (strcmp(option, "1") != 0 && strcmp(option, "2") != 0 && strcmp(option, "3") != 0 && strcmp(option, "4") != 0 && strcmp(option, "5") != 0);
+
+	if (strcmp(option, "1") == 0)
+	{
+		option1();
+		optionMenu();
+	}
+	else
+		if (strcmp(option, "2") == 0)
+		{
+			option2();
+			optionMenu();
+		}
+}
+
+
+void gameMenu()
+{
+
+	char option[20];
+
+	do {
+		system("cls");
+
+		SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+		cout << "Player: " << username << "\n";
+		cout << "Money: " << playerMoney << "$";
+
+		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+		cout << title;
+		cout << "1. Play \n";
+		cout << "2. Options \n";
+		cout << "3. Exit \n\n";
+		cout << "Choose an option: ";
+
+		cin >> option;
+
+	} while (strcmp(option, "1") != 0 && strcmp(option, "2") != 0 && strcmp(option, "3") != 0);
+
+	if (strcmp(option, "1") == 0)
+	{
+
+	}
+	else
+		if (strcmp(option, "2") == 0)
+		{
+			optionMenu();
+		}
+		else
+			exit(0);
+
+
+}
+
 int main()
 {
 	
 	createDeckOfCrads(cards);
 	shuffleCards(cards);
-	
+
 	do
 	{
 		goBack = 0;
 		menu();
 	} while (goBack);
 
+	gameMenu();
+
 	getchar();
-	getchar();
+	//getchar();
 }

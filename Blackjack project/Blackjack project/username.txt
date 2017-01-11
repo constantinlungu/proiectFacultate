@@ -2,3 +2,13 @@ dan
 coco
 vasile
 test
+killa
+andrei
+test2
+robert
+gabriela
+tets3
+test4
+dorel
+player
+test5
