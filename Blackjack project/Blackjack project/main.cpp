@@ -22,11 +22,12 @@ struct deck
 
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-int goBack, index;
+int goBack, index=0;
 char password[50], username[50];
 long long int playerMoney;
 
 bool isOk = false;
+bool goToGameMenu;
 
 void loginPassword()
 {
@@ -280,6 +281,7 @@ int verifyUsername(char username[50])
 	ifstream readUsername("username.txt");
 	char currentName[50];
 	int ok = 1;
+	bool okIndex = false;
 
 	cout << "\n";
 
@@ -307,9 +309,16 @@ int verifyUsername(char username[50])
 		ok = 0;
 	}
 
+	if (index == 0)
+		okIndex = true;
+
 	while (!readUsername.eof())
 	{
 		readUsername >> currentName;
+
+		if (okIndex)
+			index++;
+
 		if (_stricmp(username, currentName) == 0 && strcmp(currentName, "") != 0)
 		{
 			ok = 0;
@@ -332,6 +341,7 @@ int verifyUsername(char username[50])
 
 void signupUsername()
 {
+	index = 0;
 	system("cls");
 
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
@@ -698,6 +708,118 @@ void option2()
 	}
 }
 
+void option3()
+{
+	long long int newMoney;
+	bool ok;
+	char currentPassword[50];
+
+	do
+	{
+		system("cls");
+
+		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+		cout << options;
+
+		cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+		SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+		cout << "How much money do you want to add in account ?: ";
+
+		cin >> newMoney;
+
+		if (newMoney < 0)
+		{
+			SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+			cout << "\nSuma trebuie sa fie mai mare decat 0 ! \n\n";
+			system("pause");
+		}
+
+	} while (newMoney < 0 && newMoney != 0);
+
+	if (newMoney != 0)
+	{
+		if (!isOk)
+		{
+			isOk = true;
+			getchar();
+		}
+
+		do {
+
+			system("cls");
+
+			ok = true;
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << options;
+
+			cout << "Tastati 0 pentru a reveni la meniul anterior !\n\n";
+
+			SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+			cout << "How much money do you want to add in account ?: " << newMoney << "\n";
+
+			cout << "Confirm password: ";
+
+			cin.getline(currentPassword, 50);
+
+			if (strcmp(currentPassword, "0") != 0)
+			{
+				if (strcmp(password, currentPassword) != 0)
+				{
+					ok = false;
+					SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+					cout << "\nParola incorecta ! \n\n";
+					system("pause");
+				}
+			}
+
+		} while (!ok && strcmp(currentPassword, "0") != 0);
+
+		if (strcmp(currentPassword, "0") != 0)
+		{
+
+			ifstream readMoney("money.txt");
+			ofstream writeTemp("temp.txt");
+
+			long long int temp;
+
+			int i = 0;
+
+			while (readMoney >> temp)
+			{
+				i++;
+
+				if (temp == playerMoney && i == index)
+					temp = temp + newMoney;
+
+				writeTemp << temp << "\n";
+			}
+
+			playerMoney = playerMoney + newMoney;
+
+			readMoney.close();
+			writeTemp.close();
+
+			remove("money.txt");
+			rename("temp.txt", "money.txt");
+
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << "\n\t\t\t\t\t   Banii au fost adaugati cu succes ! \n";
+
+			getchar();
+		}
+	}
+
+}
+
 void optionMenu()
 {
 	char option[20];
@@ -716,7 +838,7 @@ void optionMenu()
 		cout << "1. Change username \n";
 		cout << "2. Change password \n";
 		cout << "3. Add money \n";
-		cout << "4. Log in to another account \n";
+		cout << "4. Log in to another account \\ Log out \n";
 		cout << "5. Back \n\n";
 		cout << "Choose an option: ";
 
@@ -737,13 +859,63 @@ void optionMenu()
 			option2();
 			optionMenu();
 		}
+		else
+			if (strcmp(option, "3") == 0)
+			{
+				option3();
+				optionMenu();
+			}
+			else
+				if (strcmp(option, "4") == 0)
+					goBack = 1;
+				else
+					goToGameMenu = true;
+
 }
 
+void optionGame()
+{
+	char option[20];
+
+	do
+	{
+		system("cls");
+
+		SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+		cout << "Player: " << username << "\n";
+		cout << "Money: " << playerMoney << "$";
+
+		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+		cout << title;
+		cout << "1. Single player \n";
+		cout << "2. Two players \n";
+		cout << "3. Back \n\n";
+		cout << "Choose an option: ";
+
+		cin >> option;
+	} while (strcmp(option, "1") != 0 && strcmp(option, "2") != 0 && strcmp(option, "3") != 0);
+
+	if (strcmp(option, "1") == 0)
+	{
+
+	}
+	else
+		if (strcmp(option, "2") == 0)
+		{
+
+		}
+		else
+			goToGameMenu = true;
+
+}
 
 void gameMenu()
 {
 
 	char option[20];
+	goToGameMenu = false;
 
 	do {
 		system("cls");
@@ -767,12 +939,18 @@ void gameMenu()
 
 	if (strcmp(option, "1") == 0)
 	{
+		optionGame();
 
+		if (goToGameMenu)
+			gameMenu();
 	}
 	else
 		if (strcmp(option, "2") == 0)
 		{
 			optionMenu();
+
+			if (goToGameMenu)
+				gameMenu();
 		}
 		else
 			exit(0);
@@ -785,15 +963,20 @@ int main()
 	
 	createDeckOfCrads(cards);
 	shuffleCards(cards);
-
+	
+	Back:
 	do
 	{
 		goBack = 0;
 		menu();
 	} while (goBack);
 
+	goBack = 0;
 	gameMenu();
 
+	if (goBack)
+		goto Back;
+
 	getchar();
-	//getchar();
+
 }
