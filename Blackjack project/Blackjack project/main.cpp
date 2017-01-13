@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <windows.h>
 #include <fstream>
 #include <string.h>
@@ -18,11 +18,18 @@ struct deck
 {
 	int number;
 	char suit;
+	char design[10][10];
+
 }cards[NUMBER_OF_CARDS];
+
+deck cardsPlayer1[50], cardsPlayer2[50], cardsDealer[50];
+int numberCardsPlayer1, numberCardsPlayer2, numberCardsDealer;
+char heartCard[10][10], diamondCard[10][10], spadeCard[10][10], clubCard[10][10];
+int sumPlayer1, sumPlayer2, sumDealer;
 
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-int goBack, index=0;
+int goBack, index=0, numberOfCards;
 char password[50], username[50];
 long long int playerMoney;
 
@@ -413,15 +420,107 @@ void menu()
 
 }
 
+void renameCard(deck &card)
+{
+	switch (card.number)
+	{
+		case 2:
+		{
+			card.design[1][1] = '2';
+			card.design[4][6] = '2';
+			break;
+		}
+		case 3:
+		{
+			card.design[1][1] = '3';
+			card.design[4][6] = '3';
+			break;
+		}
+		case 4:
+		{
+			card.design[1][1] = '4';
+			card.design[4][6] = '4';
+			break;
+		}
+		case 5:
+		{
+			card.design[1][1] = '5';
+			card.design[4][6] = '5';
+			break;
+		}
+		case 6:
+		{
+			card.design[1][1] = '6';
+			card.design[4][6] = '6';
+			break;
+		}
+		case 7:
+		{
+			card.design[1][1] = '7';
+			card.design[4][6] = '7';
+			break;
+		}
+		case 8:
+		{
+			card.design[1][1] = '8';
+			card.design[4][6] = '8';
+			break;
+		}
+		case 9:
+		{
+			card.design[1][1] = '9';
+			card.design[4][6] = '9';
+			break;
+		}
+		case 10:
+		{
+			card.design[1][1] = 'X';
+			card.design[4][6] = 'X';
+			break;
+		}
+		case 11:
+		{
+			card.design[1][1] = 'J';
+			card.design[4][6] = 'J';
+			break;
+		}
+		case 12:
+		{
+			card.design[1][1] = 'Q';
+			card.design[4][6] = 'Q';
+			break;
+		}
+		case 13:
+		{
+			card.design[1][1] = 'K';
+			card.design[4][6] = 'K';
+			break;
+		}
+		case 14:
+		{
+			card.design[1][1] = 'A';
+			card.design[4][6] = 'A';
+			break;
+		}
+	}
+	
+}
 
-void createDeckOfCrads(deck cards[NUMBER_OF_CARDS])
+void createDeckOfCards(deck cards[NUMBER_OF_CARDS])
 {
 	int i = 0, numberOfCard = 2;
-	
+	numberOfCards = NUMBER_OF_CARDS-1;
+
 	while (i < 13)
 	{
-		cards[i].suit = 'C';
+		cards[i].suit = 'H';
 		cards[i].number = numberOfCard;
+		
+		for (int j = 0; j < 6; j++)
+			strcpy_s(cards[i].design[j], heartCard[j]);
+
+		renameCard(cards[i]);
+
 		i++;
 		numberOfCard++;
 	}
@@ -432,16 +531,28 @@ void createDeckOfCrads(deck cards[NUMBER_OF_CARDS])
 	{
 		cards[i].suit = 'D';
 		cards[i].number = numberOfCard;
+
+		for (int j = 0; j < 6; j++)
+			strcpy_s(cards[i].design[j], diamondCard[j]);
+
+		renameCard(cards[i]);
+
 		i++;
 		numberOfCard++;
 	}
 
 	numberOfCard = 2;
-
+	
 	while (i < 39)
 	{
-		cards[i].suit = 'H';
+		cards[i].suit = 'C';
 		cards[i].number = numberOfCard;
+
+		for (int j = 0; j < 6; j++)
+			strcpy_s(cards[i].design[j], clubCard[j]);
+
+		renameCard(cards[i]);
+
 		i++;
 		numberOfCard++;
 	}
@@ -452,6 +563,12 @@ void createDeckOfCrads(deck cards[NUMBER_OF_CARDS])
 	{
 		cards[i].suit = 'S';
 		cards[i].number = numberOfCard;
+
+		for (int j = 0; j < 6; j++)
+			strcpy_s(cards[i].design[j], spadeCard[j]);
+
+		renameCard(cards[i]);
+
 		i++;
 		numberOfCard++;
 	}
@@ -460,6 +577,8 @@ void createDeckOfCrads(deck cards[NUMBER_OF_CARDS])
 void shuffleCards(deck cards[NUMBER_OF_CARDS])
 {
 	srand(time(0));
+
+	numberOfCards = NUMBER_OF_CARDS - 1;
 
 	for (int i = 0; i < NUMBER_OF_CARDS; i++)
 	{
@@ -873,6 +992,302 @@ void optionMenu()
 
 }
 
+void cardsDesign()
+{
+	ifstream cards("cards.txt");
+
+	for (int i = 0; i < 6; i++)
+		cards.getline(heartCard[i], 10);
+
+	for (int i = 0; i < 6; i++)
+		cards.getline(diamondCard[i], 10);
+
+	for (int i = 0; i < 6; i++)
+		cards.getline(clubCard[i], 10);
+
+	for (int i = 0; i < 6; i++)
+		cards.getline(spadeCard[i], 10);
+
+}
+
+void sumCardsDealer(int number)
+{
+	if (number <= 10)
+		sumDealer += number;
+
+	if (number > 10 && number < 14)
+		sumDealer += 10;
+
+	if (number == 14)
+	{
+		if (sumDealer + 11 > 21)
+			sumDealer += 1;
+		else
+			sumDealer += 11;
+	}
+
+}
+
+deck takeCard(deck cards[NUMBER_OF_CARDS])
+{
+	deck card;
+	if (numberOfCards > 0)
+	{
+		card = cards[numberOfCards];
+		numberOfCards--;
+	}
+	else
+	{
+		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+		cout << "\nSe amesteca cartile...";
+		shuffleCards(cards);
+		Sleep(1000);
+		card = cards[numberOfCards];
+		numberOfCards--;
+	}
+
+	return card;
+}
+
+void printCards()
+{
+	system("cls");
+	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+	cout << title;
+
+	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+	cout << username << "'s cards: suma: "<<sumPlayer1<<" \n";
+
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < numberCardsPlayer1; j++)
+			cout << cardsPlayer1[j].design[i] << "  ";
+
+		cout << "\n";
+	}
+
+	cout << "\n";
+
+	SetConsoleTextAttribute(h, 9 | FOREGROUND_INTENSITY);
+
+	cout <<"Dealer's cards: suma: " << sumDealer << " \n";
+
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < numberCardsDealer-1; j++)
+			cout << cardsDealer[j].design[i] << "  ";
+
+		cout << "\n";
+	}
+
+	cout << "\n";
+
+}
+
+void sumCardsPlayer(int number, int &sumPlayer)
+{
+	if (number <= 10)
+		sumPlayer += number;
+
+	if (number > 10 && number < 14)
+		sumPlayer += 10;
+
+	if (number == 14)
+	{
+		int option;
+		do
+		{
+			printCards();
+			cout << "\nDoresti ca AS-ul sa aiba valoarea 11 sau 1 ?: ";
+			cin >> option;
+
+		} while (option != 1 && option != 11);
+
+		if (option == 1)
+			sumPlayer += 1;
+		else
+			sumPlayer += 11;
+	}
+
+}
+
+void firstHandPlayer()
+{
+	numberCardsPlayer1 = 0;
+	numberCardsDealer = 0;
+	sumPlayer1 = 0;
+	sumDealer = 0;
+
+	char option[50];
+
+	cardsPlayer1[numberCardsPlayer1++] = takeCard(cards);
+	sumCardsPlayer(cardsPlayer1[numberCardsPlayer1 - 1].number, sumPlayer1);
+
+	cardsPlayer1[numberCardsPlayer1++] = takeCard(cards);
+	sumCardsPlayer(cardsPlayer1[numberCardsPlayer1 - 1].number, sumPlayer1);
+
+	
+
+	cardsDealer[numberCardsDealer++] = takeCard(cards);
+	sumCardsDealer(cardsDealer[numberCardsDealer - 1].number);
+
+	cardsDealer[numberCardsDealer++] = takeCard(cards);
+	sumCardsDealer(cardsDealer[numberCardsDealer - 1].number);
+
+	if (sumPlayer1 == 21)
+	{
+		cout << "Ai castigat ! \n";
+		getchar();
+	}
+	else
+	{
+		do
+		{
+			do
+			{
+				printCards();
+				SetConsoleTextAttribute(h, 15 | FOREGROUND_INTENSITY);
+
+				cout << "Hit or Stand (H\\S): ";
+				cin >> option;
+			} while (_stricmp(option, "H") != 0 && _stricmp(option, "S") != 0);
+
+			if (_stricmp(option, "H") == 0)
+			{
+				cardsPlayer1[numberCardsPlayer1++] = takeCard(cards);
+				sumCardsPlayer(cardsPlayer1[numberCardsPlayer1 - 1].number, sumPlayer1);
+			}
+
+		} while (_stricmp(option, "H") == 0 && sumPlayer1 < 21);
+
+		if (sumPlayer1 == 21)
+		{
+			printCards();
+			cout << "Ai castigat ! \n";
+			getchar();
+		}
+		else
+		{
+			if (sumPlayer1 > 21)
+			{
+				printCards();
+				cout << "Ai pierdut ! \n";
+				getchar();
+			}
+			else
+			{
+				printCards();
+				cout << "Randul dealerului ! \n";
+				getchar();
+			}
+		}
+	}
+
+}
+
+int bet()
+{
+	long long int sum;
+	bool ok;
+
+	if (playerMoney > 0)
+	{
+		do
+		{
+			ok = true;
+			system("cls");
+			SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+			cout << title;
+			cout << "Ce suma doresti sa pariezi ?: ";
+
+			cin >> sum;
+
+			if (sum <= 0)
+			{
+				SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+				cout << "Suma pariata trebuie sa fie > 0 !\n\n";
+
+				ok = false;
+			}
+
+			if (sum > playerMoney)
+			{
+				SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+				cout << "Suma pariata trebuie sa fie <= ";
+
+				SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+				cout << playerMoney;
+
+				SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+				cout << " !\n\n";
+
+				ok = false;
+			}
+
+			if (!ok)
+				system("pause");
+
+		} while (sum <= 0 || sum > playerMoney);
+
+		playerMoney = playerMoney - sum;
+
+		return sum;
+	}
+	else
+	{
+		SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+		cout << "Nu aveti suficienti bani in cont, adaugati din meniul de optiuni !\n\n";
+		system("pause");
+
+		return 0;
+	}
+}
+
+void singlePlayer()
+{
+	char option[50], cardNumber[2];
+	int playerBet;
+
+	playerBet = bet();
+
+	if (playerBet)
+	{
+		system("cls");
+		SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+		cout << title;
+
+		firstHandPlayer();
+
+		/*cout << "\noption: ";
+		cin >> option;
+
+		while (_stricmp(option, "y") == 0)
+		{
+			cout << "sum: " << sumPlayer << "\n";
+			if (numberOfCards == 0)
+			{
+				cout << "Se amesteca cartile !\n";
+				shuffleCards(cards);
+				system("pause");
+			}
+			deck card = takeCard(cards);
+			
+			cin >> option;
+		}*/
+	}
+
+
+}
+
 void optionGame()
 {
 	char option[20];
@@ -899,7 +1314,11 @@ void optionGame()
 
 	if (strcmp(option, "1") == 0)
 	{
+		cardsDesign();
+		createDeckOfCards(cards);
+		shuffleCards(cards);
 
+		singlePlayer();
 	}
 	else
 		if (strcmp(option, "2") == 0)
@@ -954,16 +1373,10 @@ void gameMenu()
 		}
 		else
 			exit(0);
-
-
 }
 
 int main()
 {
-	
-	createDeckOfCrads(cards);
-	shuffleCards(cards);
-	
 	Back:
 	do
 	{
