@@ -1090,8 +1090,11 @@ deck takeCard(deck cards[NUMBER_OF_CARDS])
 void printCards()
 {
 	system("cls");
-	cout << "PlayerMoney: " << playerMoney<<endl;
-	cout << "PlayerBet: " << playerBet<<endl;
+	SetConsoleTextAttribute(h, 11 | FOREGROUND_INTENSITY);
+
+	cout << "Player: " << username << "\n";
+	cout << "Money: " << playerMoney << "$";
+
 	SetConsoleTextAttribute(h, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
 	cout << title;
